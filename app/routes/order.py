@@ -1,7 +1,13 @@
-from flask import Blueprint
+from flask import Blueprint, request, jsonify
+from app.models import db, Order
 
-bp = Blueprint('order', __name__, url_prefix='/orders')
+bp = Blueprint('orders', __name__, url_prefix='/orders')
 
-@bp.route('', methods=['GET'])
-def order():
-        return 'orders'
+@bp.route('', methods=['POST'])
+def add_order():
+    data = request.json
+    order = Order(customer_id=data['customer_id'], item=data['item'], amount=data['amount'])
+    db.session.add(order)
+    db.session.commit()
+
+    return jsonify({'message': 'Order added and SMS sent!'}), 201
